@@ -10,17 +10,28 @@ import (
 	"strings"
 )
 
+type ViewCall struct {
+	Id        string
+	TargetAbi string
+	Target    string
+	Method    string
+	Arguments []interface{}
+}
+
+type MultiCall interface {
+	CallTargets(ctx context.Context, calls []*ViewCall) (map[string][]interface{}, error)
+}
+
 type multiCall struct {
 	explorerRpc  string
 	multiAddress string
-	abi          string
 }
 
-type ViewCall struct {
-	id        string
-	target    string
-	method    string
-	arguments []interface{}
+func NewMultiCall(exploreRpc, multiAddress string) *multiCall {
+	return &multiCall{
+		explorerRpc:  exploreRpc,
+		multiAddress: multiAddress,
+	}
 }
 
 func (m *multiCall) CallTargets(ctx context.Context, calls []*ViewCall) (map[string][]interface{}, error) {
@@ -31,18 +42,19 @@ func (m *multiCall) CallTargets(ctx context.Context, calls []*ViewCall) (map[str
 
 	var multiCallList []contract.Multicall2Call
 	for _, call := range calls {
-		targetAbi, err := abi.JSON(strings.NewReader(m.abi))
+		targetAbi, err := abi.JSON(strings.NewReader(call.TargetAbi))
 		if err != nil {
+
 			return nil, err
 		}
 
-		data, err := targetAbi.Pack(call.method, call.arguments)
+		data, err := targetAbi.Pack(call.Method, call.Arguments...)
 		if err != nil {
 			return nil, err
 		}
 
 		multi2Call := contract.Multicall2Call{
-			Target:   common.HexToAddress(call.target),
+			Target:   common.HexToAddress(call.Target),
 			CallData: data,
 		}
 
@@ -63,16 +75,16 @@ func (m *multiCall) CallTargets(ctx context.Context, calls []*ViewCall) (map[str
 
 	res := make(map[string][]interface{})
 	for i, call := range calls {
-		targetAbi, err := abi.JSON(strings.NewReader(m.abi))
+		targetAbi, err := abi.JSON(strings.NewReader(call.TargetAbi))
 		if err != nil {
 			return nil, err
 		}
 
-		o, err := targetAbi.Unpack(call.target, multiRes[i].ReturnData)
+		o, err := targetAbi.Unpack(call.Method, multiRes[i].ReturnData)
 		if err != nil {
 			return nil, err
 		}
-		res[call.id] = o
+		res[call.Id] = o
 	}
 	return res, nil
 }
