@@ -9,7 +9,7 @@ const (
 	EthGoerliTestnetRPC  = "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
 	EthKovanTestnetRPC   = "https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
 
-	EthMainnetMultiCallAddress        = "0xeefba1e63905ef1d7acba5a8513c70307c1ce441"
+	EthMainnetMultiCallAddress        = "0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696"
 	EthRopstenTestnetMultiCallAddress = "0x53c43764255c17bd724f74c4ef150724ac50a3ed"
 	EthRinkebyTestnetMultiCallAddress = "0x42ad527de7d4e9d9d011ac45b31d8551f8fe9821"
 	EthGoerliTestnetMultiCallAddress  = "0x77dca2c955b15e9de4dbbcf1246b4b85b651e50e"
